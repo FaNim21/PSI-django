@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'CS2Ranking.apps.Cs2RankingConfig',
+
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

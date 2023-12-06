@@ -16,7 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from CS2Ranking import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('players/', views.get_players_data),
+    path('kadra_wmii', views.kadra_wmii),
 ]
