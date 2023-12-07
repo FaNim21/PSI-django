@@ -9,9 +9,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from ..models import Player
 
-
 @api_view(['GET'])
 def get_players(request):
-    print(request)
+    # tu bedzie wyciagana baza danych graczy
+    # Player.objects.create()
     player = {'name': 'elo', 'nationality': 'poland'}
     return Response(player)

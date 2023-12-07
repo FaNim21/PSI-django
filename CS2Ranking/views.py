@@ -5,9 +5,11 @@ from rest_framework.decorators import api_view
 import requests
 from bs4 import BeautifulSoup
 
+
 from .custom_views.rankingPlayer import (
     get_players
 )
+
 
 @api_view(["GET"])
 def get_players_data(request):
