@@ -1,45 +1,102 @@
+from django.db.models import Q
+from django.forms import model_to_dict
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.views import View
+from django.views.generic import DetailView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-import requests
-from bs4 import BeautifulSoup
+import datetime
+
+from .models import Player, Team, Match
 
 
-from .custom_views.rankingPlayer import (
-    get_players
-)
+# ======================================================
+# PLAYERS
+class PlayerView(View):
+    def get(self, request):
+        players = Player.objects.all().values()
+        data = {'players': list(players)}
+        return JsonResponse(data, safe=False)
 
 
-@api_view(["GET"])
-def get_players_data(request):
-    return get_players(request._request)
+class PlayerIDView(DetailView):
+    def get(self, request, pk):
+        player = Player.objects.get(id=pk)
+        data = {'player': model_to_dict(player)}
+        return JsonResponse(data, safe=False)
 
-@api_view(["GET"])
-def kadra_wmii(request):
-    url = 'http://wmii.uwm.edu.pl/kadra'
-    response = requests.get(url)
 
-    soup = BeautifulSoup(response.content, features="html.parser")
-    table = soup.find('table', class_='views-table cols-8').find('tbody')
+class PlayerRankingView(View):
+    def get(self, request):
+        players = Player.objects.all().values().order_by('-rating')
+        data = {'players': list(players)}
+        return JsonResponse(data, safe=False)
 
-    list = []
 
-    for row in table:
-        degree = row.find('td', class_='views-field views-field-degree').text.strip()
-        name = row.find('td', class_='views-field views-field-title active').text.strip()
-        phone = row.find('td', class_='views-field views-field-field-phone').text.strip()
+# ======================================================
+# TEAMS
+class TeamView(View):
+    def get(self, request):
+        team = Team.objects.all().values()
+        data = {'teams': list(team)}
+        return JsonResponse(data, safe=False)
 
-        email_td = row.find('td', class_='views-field views-field-field-email')
-        email_span = email_td.find('span')
 
-        if email_span:
-            email_a = email_span.find('a')
-            email = email_a.text.strip() if email_a else None
-        else:
-            email = None
+class TeamRankingView(View):
+    def get(self, request):
+        team = Team.objects.all().values().order_by('world_ranking')
+        data = {'teams': list(team)}
+        return JsonResponse(data, safe=False)
 
-        list.append(name)
 
-        # print(degree, name, phone, email_td)
-    return Response(list)
+# ======================================================
+# MATCHES
+
+class MatchView(View):
+    def get(self, request):
+        match = Match.objects.all().values()
+        data = {'matches': list(match)}
+        return JsonResponse(data, safe=False)
+
+
+class MatchTodayView(View):
+    def get(self, request):
+        today = datetime.date.today()
+        matches_today = Match.objects.filter(time__date=today).values()
+        data = {'today_match': list(matches_today)}
+        return JsonResponse(data, safe=False)
+
+
+# ======================================================
+# GENERAL
+class SearchTeamAndPlayerView(DetailView):
+    def get(self, request, output):
+        result = output.strip()
+        if not result:
+            return JsonResponse({'asd': 'asd'}, safe=False)
+
+        players = Player.objects.filter(nickname__icontains=result).values()
+        teams = Team.objects.filter(name__icontains=result).values()
+        data = {'players': list(players), 'teams': list(teams)}
+        return JsonResponse(data, safe=False)
+
+
+class SearchAllView(View):
+    def get(self, request):
+        players = Player.objects.all().values()
+        teams = Team.objects.all().values()
+        data = {'players': list(players), 'teams': list(teams)}
+        return JsonResponse(data, safe=False)
+
+
+
+
+
+
+
+
+
+
+
+

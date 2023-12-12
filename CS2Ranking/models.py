@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 
 class Player(models.Model):
@@ -8,6 +9,8 @@ class Player(models.Model):
     age = models.IntegerField()
     nationality = models.CharField(max_length=40)
     current_team = models.CharField(max_length=40)
+    rating = models.FloatField(null=True)
+
 
 class Team(models.Model):
     name = models.CharField(max_length=40)
@@ -15,3 +18,18 @@ class Team(models.Model):
     world_ranking = models.IntegerField()
     coach = models.CharField(max_length=40)
     rosters = models.ManyToManyField(Player)
+
+
+class MapResult(models.Model):
+    name = models.CharField(max_length=40, null=True)
+    teamAResult = models.IntegerField(null=True)
+    teamBResult = models.IntegerField(null=True)
+    whoPicked = models.CharField(max_length=40, null=True)
+
+
+class Match(models.Model):
+    tournament = models.CharField(max_length=40, null=True)
+    teamA = models.CharField(max_length=40, null=True)
+    teamB = models.CharField(max_length=40, null=True)
+    time = models.DateTimeField(null=True)
+    maps = models.ManyToManyField(MapResult)
