@@ -8,7 +8,7 @@ class Player(models.Model):
     fullname = models.CharField(max_length=40);
     age = models.IntegerField()
     nationality = models.CharField(max_length=40)
-    current_team = models.CharField(max_length=40)
+    current_team = models.ForeignKey('Team', on_delete=models.CASCADE, null=True)
     rating = models.FloatField(null=True)
 
 
@@ -33,3 +33,4 @@ class Match(models.Model):
     teamB = models.CharField(max_length=40, null=True)
     time = models.DateTimeField(null=True)
     maps = models.ManyToManyField(MapResult)
+    live_viewers = models.IntegerField(null=True)

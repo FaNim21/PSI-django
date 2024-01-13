@@ -1,7 +1,6 @@
 from django.db import models
-from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import PermissionsMixin
-from django.db import models
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from CS2Ranking.models import Match
 
 
 class UserManager(BaseUserManager):
@@ -11,7 +10,7 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('User must have an email address')
 
-        user: 'User' = self.model(email=self.normalize_email(email), **extra_fields)
+        user: 'RankingUser' = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
 
@@ -28,13 +27,29 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser, PermissionsMixin):
-    """Custom user model"""
-    email = models.EmailField(max_length=255, unique=True)
+class RankingUser(AbstractUser):
     name = models.CharField(max_length=255)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
+    email = models.EmailField(unique=True, null=True)
+    username = models.CharField(max_length=45, unique=True, null=True)
+    password = models.CharField(max_length=255)
 
-    objects = UserManager()
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
 
-    USERNAME_FIELD = 'email'
+    def __str__(self):
+        return self.email
+
+
+class Comment(models.Model):
+    ranking_user = models.ForeignKey(
+        RankingUser,
+        on_delete=models.SET_DEFAULT,
+        default=None,
+    )
+    match = models.ForeignKey(
+        Match,
+        on_delete=models.CASCADE,
+        related_name="comments",
+    )
+    text = models.CharField(max_length=140)
+    created_time = models.DateTimeField(auto_now_add=True)

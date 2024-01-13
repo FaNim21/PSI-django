@@ -1,7 +1,7 @@
 from django.urls import path
 from CS2Ranking.views import PlayerView, PlayerIDView, PlayerRankingView
 from CS2Ranking.views import TeamView, TeamRankingView
-from CS2Ranking.views import MatchView, MatchTodayView, MatchByDateView
+from CS2Ranking.views import MatchView, MatchTodayView, MatchByDateView, MatchPopularView
 from CS2Ranking.views import SearchTeamAndPlayerView, SearchAllView
 
 # docker build -t cs2ranking .
@@ -17,8 +17,9 @@ urlpatterns = [
 
     path('matches/', MatchView.as_view(), name='matches_list'),
     path('matches/today/', MatchTodayView.as_view(), name='match_list_today'),
-    path('matches/<str:output>/', MatchByDateView.as_view(), name='match_list_today'),
+    path('matches/date/<str:date>/', MatchByDateView.as_view(), name='match_list_today'),
+    path('matches/popular/', MatchPopularView.as_view(), name='match_list_popular'),
 
-    path('search/<str:output>/', SearchTeamAndPlayerView.as_view(), name='search_team_and_player'),
+    path('search/<str:name>/', SearchTeamAndPlayerView.as_view(), name='search_team_and_player'),
     path('search/', SearchAllView.as_view(), name='search_team_and_player')
 ]

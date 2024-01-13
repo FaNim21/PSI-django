@@ -8,98 +8,118 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import datetime
 
+from rest_framework.views import APIView
+
 from .models import Player, Team, Match
+from .serializers import PlayerSerializer, TeamSerializer, MatchSerializer
 
 
 # ======================================================
 # PLAYERS
-class PlayerView(View):
+class PlayerView(APIView):
     def get(self, request):
-        players = Player.objects.all().values()
-        data = {'players': list(players)}
+        players = Player.objects.all()
+        serializer = PlayerSerializer(players, many=True)
+        data = {'players': serializer.data}
         return JsonResponse(data, safe=False)
 
 
-class PlayerIDView(DetailView):
+class PlayerIDView(APIView):
     def get(self, request, pk):
         player = Player.objects.get(id=pk)
-        data = {'player': model_to_dict(player)}
+        serializer = PlayerSerializer(player)
+        data = {'player': serializer.data}
         return JsonResponse(data, safe=False)
 
 
-class PlayerRankingView(View):
+class PlayerRankingView(APIView):
     def get(self, request):
-        players = Player.objects.all().values().order_by('-rating')
-        data = {'players': list(players)}
+        players = Player.objects.all().order_by('-rating')
+        serializer = PlayerSerializer(players, many=True)
+        data = {'players': serializer.data}
         return JsonResponse(data, safe=False)
-
 
 
 # ======================================================
 # TEAMS
-class TeamView(View):
+class TeamView(APIView):
     def get(self, request):
-        team = Team.objects.all().values()
-        data = {'teams': list(team)}
+        team = Team.objects.all()
+        serializer = TeamSerializer(team, many=True)
+        data = {'teams': serializer.data}
+        print(data)
         return JsonResponse(data, safe=False)
 
 
-class TeamRankingView(View):
+class TeamRankingView(APIView):
     def get(self, request):
-        team = Team.objects.all().values().order_by('world_ranking')
-        data = {'teams': list(team)}
+        team = Team.objects.all().order_by('world_ranking')
+        serializer = TeamSerializer(team, many=True)
+        data = {'teams': serializer.data}
         return JsonResponse(data, safe=False)
-
 
 
 # ======================================================
 # MATCHES
 
-class MatchView(View):
+class MatchView(APIView):
     def get(self, request):
-        match = Match.objects.all().values()
-        data = {'matches': list(match)}
+        match = Match.objects.all()
+        serializer = MatchSerializer(match, many=True)
+        data = {'matches': serializer.data}
         return JsonResponse(data, safe=False)
 
 
-class MatchTodayView(View):
+class MatchTodayView(APIView):
     def get(self, request):
         today = datetime.date.today()
-        matches_today = Match.objects.filter(time__date=today).values()
-        data = {'today_match': list(matches_today)}
+        matches_today = Match.objects.filter(time__date=today)
+        serializer = MatchSerializer(matches_today, many=True)
+        data = {'today_match': serializer.data}
         return JsonResponse(data, safe=False)
 
 
-class MatchByDateView(DetailView):
-    def get(self, request, output):
+class MatchByDateView(APIView):
+    def get(self, request, date):
         date_format = "%Y-%m-%d"
-        result = datetime.datetime.strptime(output, date_format)
-
-        matches = Match.objects.filter(time__date=result).values()
-        data = {f'matches {output}': list(matches)}
+        result = datetime.datetime.strptime(date, date_format)
+        matches = Match.objects.filter(time__date=result)
+        serializer = MatchSerializer(matches, many=True)
+        data = {f'matches {date}': serializer.data}
         return JsonResponse(data, safe=False)
 
+
+class MatchPopularView(APIView):
+    def get(self, request):
+        matches_popular = Match.objects.filter(live_viewers__gt=30000)
+        serializer = MatchSerializer(matches_popular, many=True)
+        data = {'matches': serializer.data}
+        return JsonResponse(data, safe=False)
 
 
 # ======================================================
 # GENERAL
-class SearchTeamAndPlayerView(DetailView):
-    def get(self, request, output):
-        result = output.strip()
+class SearchTeamAndPlayerView(APIView):
+    def get(self, request, name):
+        result = name.strip()
         if not result:
             return JsonResponse({'data': 'empty'}, safe=False)
 
-        players = Player.objects.filter(nickname__icontains=result).values()
-        teams = Team.objects.filter(name__icontains=result).values()
-        data = {'players': list(players), 'teams': list(teams)}
+        players = Player.objects.filter(nickname__icontains=result)
+        serializer_players = PlayerSerializer(players, many=True)
+        teams = Team.objects.filter(name__icontains=result)
+        serializer_teams = TeamSerializer(teams, many=True)
+        data = {'players': serializer_players.data, 'teams': serializer_teams.data}
         return JsonResponse(data, safe=False)
 
 
-class SearchAllView(View):
+class SearchAllView(APIView):
     def get(self, request):
-        players = Player.objects.all().values()
-        teams = Team.objects.all().values()
-        data = {'players': list(players), 'teams': list(teams)}
+        players = Player.objects.all()
+        serializer_players = PlayerSerializer(players, many=True)
+        teams = Team.objects.all()
+        serializer_teams = TeamSerializer(teams, many=True)
+        data = {'players': serializer_players.data, 'teams': serializer_teams.data}
         return JsonResponse(data, safe=False)
 
 
