@@ -34,6 +34,7 @@ class PlayerRankingView(View):
         return JsonResponse(data, safe=False)
 
 
+
 # ======================================================
 # TEAMS
 class TeamView(View):
@@ -48,6 +49,7 @@ class TeamRankingView(View):
         team = Team.objects.all().values().order_by('world_ranking')
         data = {'teams': list(team)}
         return JsonResponse(data, safe=False)
+
 
 
 # ======================================================
@@ -68,13 +70,24 @@ class MatchTodayView(View):
         return JsonResponse(data, safe=False)
 
 
+class MatchByDateView(DetailView):
+    def get(self, request, output):
+        date_format = "%Y-%m-%d"
+        result = datetime.datetime.strptime(output, date_format)
+
+        matches = Match.objects.filter(time__date=result).values()
+        data = {f'matches {output}': list(matches)}
+        return JsonResponse(data, safe=False)
+
+
+
 # ======================================================
 # GENERAL
 class SearchTeamAndPlayerView(DetailView):
     def get(self, request, output):
         result = output.strip()
         if not result:
-            return JsonResponse({'asd': 'asd'}, safe=False)
+            return JsonResponse({'data': 'empty'}, safe=False)
 
         players = Player.objects.filter(nickname__icontains=result).values()
         teams = Team.objects.filter(name__icontains=result).values()
