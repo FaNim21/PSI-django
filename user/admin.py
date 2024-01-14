@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import RankingUser, Comment
 
-# Register your models here.
+admin.site.register(RankingUser)
+admin.site.register(Comment)

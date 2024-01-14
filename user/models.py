@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from CS2Ranking.models import Match
+from CS2Ranking.models import Match, Team
 
 
 class UserManager(BaseUserManager):
@@ -32,6 +32,7 @@ class RankingUser(AbstractUser):
     email = models.EmailField(unique=True, null=True)
     username = models.CharField(max_length=45, unique=True, null=True)
     password = models.CharField(max_length=255)
+    favourite_teams = models.ManyToManyField(Team)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]

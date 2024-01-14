@@ -11,6 +11,9 @@ class Player(models.Model):
     current_team = models.ForeignKey('Team', on_delete=models.CASCADE, null=True)
     rating = models.FloatField(null=True)
 
+    def __str__(self):
+        return self.nickname
+
 
 class Team(models.Model):
     name = models.CharField(max_length=40)
@@ -19,12 +22,18 @@ class Team(models.Model):
     coach = models.CharField(max_length=40)
     rosters = models.ManyToManyField(Player)
 
+    def __str__(self):
+        return self.name
+
 
 class MapResult(models.Model):
     name = models.CharField(max_length=40, null=True)
     teamAResult = models.IntegerField(null=True)
     teamBResult = models.IntegerField(null=True)
     whoPicked = models.CharField(max_length=40, null=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Match(models.Model):
@@ -34,3 +43,6 @@ class Match(models.Model):
     time = models.DateTimeField(null=True)
     maps = models.ManyToManyField(MapResult)
     live_viewers = models.IntegerField(null=True)
+
+    def __str__(self):
+        return f"{self.tournament} - {self.time}"

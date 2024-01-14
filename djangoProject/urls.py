@@ -5,6 +5,9 @@ from rest_framework.documentation import include_docs_urls
 # docker build -t cs2ranking .
 # docker run -dp 127.0.0.1:8000:8000 cs2ranking
 
+# docker compose build
+# docker compose up
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 

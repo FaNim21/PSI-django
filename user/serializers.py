@@ -2,6 +2,9 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from django.utils.translation import gettext as _
 
+from CS2Ranking.serializers import MatchSerializer
+from user.models import Comment
+
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the user object"""
@@ -63,3 +66,23 @@ class AuthTokenSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class CommentUserSerializer(serializers.Serializer):
+    match = MatchSerializer(read_only=True)
+    created_time = serializers.DateTimeField()
+    text = serializers.CharField()
+
+    class Meta:
+        model = Comment
+        fields = ['match', 'created_time', 'text']
+
+
+class CommentMatchSerializer(serializers.Serializer):
+    ranking_user = UserSerializer(read_only=True)
+    created_time = serializers.DateTimeField()
+    text = serializers.CharField()
+
+    class Meta:
+        model = Comment
+        fields = ['ranking_user', 'created_time', 'text']
